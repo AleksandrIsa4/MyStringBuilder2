@@ -1,42 +1,32 @@
 package org.example;
 
-public class MyStringBuilder extends MyAbstractStringBuilder {
+public class MyStringBuilder{
 
     private Snapshot snapshot;
+    private StringBuilder sb;
 
     public MyStringBuilder() {
-        super(16);
+        sb = new StringBuilder();
         createSnapshot();
     }
 
-    public MyStringBuilder(int capacity) {
-        super(capacity);
+    public MyStringBuilder append(String str) {
         createSnapshot();
-    }
-
-    public MyStringBuilder(String str) {
-        super(str);
-        createSnapshot();
-    }
-
-    @Override
-    public MyAbstractStringBuilder append(String str) {
-        createSnapshot();
-        return super.append(str);
+        sb.append(str);
+        return this;
     }
 
     public String toString() {
-        return value.length == 0 ? null : new String(value);
+        return sb.toString();
     }
 
     public void createSnapshot() {
-        this.snapshot = new Snapshot(value, count, snapshot);
+        this.snapshot = new Snapshot(sb.toString(), snapshot);
     }
 
     public void undo() {
         if (snapshot != null) {
-            this.value = snapshot.getValue();
-            this.count = snapshot.getCount();
+            sb = (snapshot.getValue() == null) ? new StringBuilder() : new StringBuilder(snapshot.getValue());
             this.snapshot = snapshot.getSnapshot();
         }
     }
@@ -44,15 +34,11 @@ public class MyStringBuilder extends MyAbstractStringBuilder {
 
 class Snapshot {
 
-    private byte[] value;
-
-    private int count;
-
+    private String value;
     private Snapshot snapshot;
 
-    public Snapshot(byte[] value, int count, Snapshot snapshot) {
+    public Snapshot(String value, Snapshot snapshot) {
         this.value = value;
-        this.count = count;
         this.snapshot = snapshot;
     }
 
@@ -60,13 +46,7 @@ class Snapshot {
         return snapshot;
     }
 
-    public int getCount() {
-        return count;
-    }
-
-
-    public byte[] getValue() {
+    public String getValue() {
         return value;
     }
-
 }
